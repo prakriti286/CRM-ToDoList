@@ -1,0 +1,59 @@
+{
+  "leads": [
+    {
+      "id": 1750330609970,
+      "name": "prakriti",
+      "company": "swageasy",
+      "contact": 4545434545,
+      "budget": 4,
+      "status": "Pending"
+    },
+    {
+      "id": 1750330649463,
+      "name": "shubham",
+      "company": "eyantra",
+      "contact": 2345645656,
+      "budget": 43,
+      "status": "Pending"
+    },
+    {
+      "id": 1750330676776,
+      "name": "kunal",
+      "company": "ecommerce",
+      "contact": 7564554345,
+      "budget": 7,
+      "status": "In Progress"
+    },
+    {
+      "id": 1750331905940,
+      "name": "kartik",
+      "company": "ladybird",
+      "contact": 3434534566,
+      "budget": 20,
+      "status": "Closed"
+    }
+  ],
+  "tasks": [
+    {
+      "id": 1750334074999,
+      "title": "call shubham for demo",
+      "dueDate": "2025-06-26",
+      "status": "Done",
+      "leadId": 1750330649463
+    },
+    {
+      "id": 1750334356548,
+      "title": "Schedule follow-up call",
+      "dueDate": "2025-06-24",
+      "status": "Pending",
+      "leadId": 1750330609970
+    },
+    {
+      "id": 1750334857415,
+      "title": "Send quotation",
+      "dueDate": "2025-06-22",
+      "status": "Pending",
+      "leadId": 1750330609970
+    }
+  ]
+}
