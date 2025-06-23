@@ -27,11 +27,15 @@
               {{ lead.status }}
             </td>
             <td class="text-center">
-              <router-link :to="`/lead/${lead.id}/tasks`" class="btn btn-sm  me-2">📋 Tasks</router-link>
-              <router-link :to="`/editlead/${lead.id}`" class="btn btn-sm  me-2">✏️ Edit</router-link>
+              <router-link :to="{ path:`/lead/${lead.id}/tasks`,
+                query:{name: lead.name,
+company: lead.company,
+      contact: lead.contact
+                }}" class="btn btn-sm  me-2"><i class="fas fa-tasks"></i> Tasks</router-link>
+              <router-link :to="`/editlead/${lead.id}`" class="btn btn-sm  me-2"><i class="fas fa-edit"></i> Edit</router-link>
               
 
-              <button @click="removeLead(lead.id)" class="btn btn-sm ">🗑️ Delete</button>
+              <button @click="removeLead(lead.id)" class="btn btn-sm "><i class="fas fa-trash-alt"></i> Delete</button>
             </td>
           </tr>
         </tbody>

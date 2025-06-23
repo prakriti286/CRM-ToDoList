@@ -1,10 +1,10 @@
 <template>
   <div class="container py-4">
-    <h3 class="fw-bold mb-4">📊 Dashboard - SmartCRM</h3>
+    <h3 class="fw-bold mb-4"><i class="fas fa-home me-1"></i> Dashboard - SmartCRM</h3>
 <!--summary-->
-    <div class="row mb-4">
-      <div class="col-md-3" v-for="card in summaryCards" :key="card.title">
-        <div class="card text-white shadow" :class="card.bg">
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 g-3 mb-4">
+  <div class="col" v-for="card in summaryCards" :key="card.title">
+    <div class="card text-white shadow" :class="card.bg">
           <div class="card-body">
             <h5 class="card-title">{{ card.icon }} {{ card.title }}</h5>
             <h2>{{ card.value }}</h2>
@@ -77,8 +77,9 @@ const summaryCards = computed(() => [
 const getBadgeClass = (status) => {
   return [
     'badge',
-    status === 'Pending' ? 'bg-warning' :
-    status === 'Closed' ? 'bg-success' : 'bg-info'
+    status === 'Pending' ? 'bg-warning text-dark' :
+    status === 'In Progress' ? 'bg-info text-dark' :
+    status === 'Closed' ? 'bg-success' : 'bg-secondary'
   ]
 }
 </script>

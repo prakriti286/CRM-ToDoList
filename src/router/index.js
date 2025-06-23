@@ -1,15 +1,16 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import LeadsPage from './views/LeadsPage.vue'
-import AddEditLead from './views/AddEditLead.vue'
-import LeadTasksPage from './views/LeadTaskPage.vue'
-import Dashboard from './views/Dashboard.vue'
+import LeadsPage from '../views/LeadsPage.vue'
+import AddEditLead from '../views/AddEditLead.vue'
+import LeadTasksPage from '../views/LeadTaskPage.vue'
+import Dashboard from '../views/Dashboard.vue'
+import AllTasksPage from '../views/AllTasksPage.vue'
 const routes = [
   {
     path: '/',
     redirect: '/dashboard' 
   },
   {
-    path: '/',
+    path: '/dashboard',
     name: 'Dashboard',
     component: Dashboard
   },
@@ -29,11 +30,17 @@ const routes = [
     component: AddEditLead,
     props: true
   },
+  
   {
     path: '/lead/:id/tasks',
     name: 'LeadTasksPage',
     component: LeadTasksPage,
     props: true
+  },
+  {
+    path: '/tasks',
+    name: 'AllTasksPage',
+    component: AllTasksPage
   }
 ]
 

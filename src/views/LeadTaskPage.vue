@@ -1,6 +1,10 @@
 <template>
   <div class="container py-4">
+
     <h3 class="mb-4">Tasks for {{ leadName }}</h3>
+<h6 class="text-muted mb-4">
+  Company: {{ company }} | Contact: {{ contact }}
+</h6>
 
    
     <Form @submit="onSubmit" :validation-schema="taskSchema" class="mb-4">
@@ -27,6 +31,7 @@
           <Field name="status" as="select" class="form-select">
             <option value="">Select Status</option>
             <option value="Pending">Pending</option>
+            <option value="in-progress">In-Progress</option>
             <option value="Done">Done</option>
           </Field>
           <ErrorMessage name="status" class="text-danger" />
@@ -43,6 +48,7 @@
         <thead class="table-dark">
           <tr>
             <th>Title</th>
+            <th>Lead ID</th>
             <th>Due Date</th>
             <th>Status</th>
             <th class="text-center">Actions</th>
@@ -51,12 +57,9 @@
         <tbody>
           <tr v-for="task in leadTasks" :key="task.id">
             <td>{{ task.title }}</td>
+            <td>{{ task.leadId }}</td>
             <td>{{ task.dueDate }}</td>
-            <td>
-              
-                {{ task.status }}
-             
-            </td>
+            <td>{{ task.status }} </td>
             <td class="text-center">
               <button @click="deleteTask(task.id)" class="btn btn-sm ">🗑️</button>
             </td>
@@ -73,22 +76,36 @@ import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 import * as yup from 'yup'
-import { computed } from 'vue'
+import { computed,onMounted } from 'vue'
 
 const store = useStore()
 const route = useRoute()
 
 const leadId = route.params.id
 
-const leadName = route.query.name
+const leadName =  computed(() => {
+  const raw =  route.query.name|| ''
+  return raw
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
+})
+const company = computed(() => route.query.company || '')
+const contact = computed(() => route.query.contact || '')
 
+
+onMounted(() => {
+  store.dispatch('tasks/fetchTasks')
+})
 const taskSchema = yup.object({
   title: yup.string().required('Task title is required'),
   dueDate: yup.string().required('Due date is required'),
   status: yup.string().required('Status is required'),
 })
 
-const leadTasks = computed(() => store.state.tasks.tasks.filter(t => String(t.leadId) === String(leadId)))
+const leadTasks = computed(() => store.state.tasks.tasks.filter(t => String(t.leadId) === String(leadId))
+.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+)
 
 function onSubmit(values, { resetForm }) {
   const newTask = { ...values, leadId }

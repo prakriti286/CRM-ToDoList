@@ -21,8 +21,10 @@ export default {
   actions: {
     async fetchTasks({ commit }) {
       try {
-        const res = await axios.get(API_URL)
-        commit('SET_TASKS', res.data)
+        const res = await axios.get(API_URL).then(res => {
+          commit('SET_TASKS', res.data)
+        })
+        
       } catch (error) {
         console.error('Error fetching tasks:', error)
       }
