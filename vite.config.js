@@ -3,11 +3,11 @@ import vue from '@vitejs/plugin-vue'
 import path from 'path'
 
 export default defineConfig({
-  base: '/CRM-ToDoList/', // For GitHub Pages deploy (correct)
+  base: '/CRM-ToDoList/',
   plugins: [vue()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src') // Required for @ alias to work
+      '@': path.resolve(__dirname, './src') 
     }
   },
   test: {

@@ -93,7 +93,7 @@ describe('LeadsPage.vue', () => {
 
     expect(Swal.fire).toHaveBeenCalledWith(expect.objectContaining({ title: 'Are you sure?' }))
     expect(deleteLead).toHaveBeenCalledWith(expect.anything(), '1', undefined)
-    expect(fetchLeads).toHaveBeenCalledTimes(2) // once onMounted, once after delete
+    expect(fetchLeads).toHaveBeenCalledTimes(2) 
     expect(Swal.fire).toHaveBeenCalledWith('Deleted!', 'Lead has been deleted.', 'success')
   })
 
