@@ -6,6 +6,12 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'admin-lte/dist/css/adminlte.min.css'
 import 'admin-lte/dist/js/adminlte.min.js'
 import '@fortawesome/fontawesome-free/css/all.min.css'
+import Swal from 'sweetalert2'
 
+const app = createApp(App)
 
-createApp(App).use(router).use(store).mount('#app')
+app.use(router)
+app.use(store)
+app.config.globalProperties.$swal = Swal
+
+app.mount('#app')

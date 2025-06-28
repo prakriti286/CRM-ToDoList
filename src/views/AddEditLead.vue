@@ -1,127 +1,205 @@
 <template>
-  <div class="container py-4">
-    <div class="card shadow-lg">
-      <div class="card-header bg-primary text-white">
-        <h4 class="mb-0">{{ isEdit ? 'Edit Lead' : 'Add New Lead' }}</h4>
+  <div class="content-wrapper px-3 py-3">
+    <section class="content-header mb-3">
+      <h1>
+        <i class="fas fa-user-edit"></i> {{ isEditMode ? 'Edit Lead' : 'Add Lead' }}
+      </h1>
+    </section>
+
+    <div class="card">
+      <div class="card-header bg-info text-white">
+        <h3 class="card-title"><i class="fas fa-address-card"></i> Lead Details</h3>
       </div>
 
       <div class="card-body">
-        <Form v-slot="{handleSubmit}" :key="formKey"
-  :validation-schema="leadSchema"
-  :initial-values="formInitialValues">
-  <form  @submit.prevent="handleSubmit(onSubmit)">
-          <div class="mb-3">
-            <label for="name" class="form-label">Name</label>
-            <Field name="name" id="name" class="form-control" autocomplete="name" />
-            <ErrorMessage name="name" class="text-danger" />
+       <form v-if="formReady" @submit.prevent="submitForm">
+
+          <div class="row">
+            <!-- Name -->
+            <div class="col-md-6 mb-3">
+              <label for="name">Name</label>
+              <input
+                id="name"
+                type="text"
+                class="form-control"
+                :class="{ 'is-invalid': nameError }"
+                v-model="nameValue"
+              />
+              <span class="text-danger small">{{ nameError }}</span>
+            </div>
+
+            <!-- Company -->
+            <div class="col-md-6 mb-3">
+              <label for="company">Company</label>
+              <input
+                id="company"
+                type="text"
+                class="form-control"
+                :class="{ 'is-invalid': companyError }"
+                v-model="companyValue"
+              />
+              <span class="text-danger small">{{ companyError }}</span>
+            </div>
+
+            <!-- Contact -->
+            <div class="col-md-6 mb-3">
+              <label for="contact">Contact</label>
+              <input
+                id="contact"
+                type="text"
+                class="form-control"
+                :class="{ 'is-invalid': contactError }"
+                v-model="contactValue"
+              />
+              <span class="text-danger small">{{ contactError }}</span>
+            </div>
+
+            <!-- Budget -->
+            <div class="col-md-6 mb-3">
+              <label for="budget">Budget</label>
+              <input
+                id="budget"
+                type="text"
+                class="form-control"
+                :class="{ 'is-invalid': budgetError }"
+                v-model="budgetValue"
+              />
+              <span class="text-danger small">{{ budgetError }}</span>
+            </div>
+
+            <!-- Status -->
+            <div class="col-md-6 mb-3">
+              <label for="status">Status</label>
+              <select
+                id="status"
+                class="form-control"
+                :class="{ 'is-invalid': statusError }"
+                v-model="statusValue"
+              >
+                <option disabled value="">Select Status</option>
+                <option>New</option>
+                <option>Pending</option>
+                <option>In Progress</option>
+                <option>Unqualified</option>
+                <option>Closed</option>
+              </select>
+              <span class="text-danger small">{{ statusError }}</span>
+            </div>
           </div>
 
-          <div class="mb-3">
-            <label  for="company" class="form-label">Company</label>
-            <Field id="company" name="company" class="form-control" autocomplete="organization" />
-            <ErrorMessage name="company" class="text-danger" />
+          <div class="text-end mt-3">
+            <button type="submit" class="btn btn-success">
+              <i class="fas fa-save"></i> {{ isEditMode ? 'Update' : 'Save' }}
+            </button>
           </div>
-<div class="mb-3">
-            <label  for="contact" class="form-label">Contact Details</label>
-            <Field id="contact" name="contact"   type="number" class="form-control" autocomplete="off"/>
-            <ErrorMessage name="contact" class="text-danger" />
-          </div>
-          <div class="mb-3">
-            <label for="budget" class="form-label">Budget</label>
-            <Field id="budget" name="budget" type="number" class="form-control"  autocomplete="off"/>
-            <ErrorMessage name="budget" class="text-danger" />
-          </div>
+          
+        </form>
 
-          <div class="mb-3">
-            <label  for="status"  class="form-label">Status</label>
-            <Field id="status" name="status" as="select" class="form-select">
-              <option value="">Select Status</option>
-              <option value="Pending">Pending</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Closed">Closed</option>
-            </Field>
-            <ErrorMessage name="status" class="text-danger" />
-          </div>
-
-          <button type="submit" class="btn btn-success me-2">Save</button>
-          <router-link to="/leads" class="btn btn-secondary">Cancel</router-link>
-  </form>
-        </Form>
+        
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { Form, Field, ErrorMessage } from 'vee-validate'
-import * as yup from 'yup'
+import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { ref, onMounted } from 'vue'
+import Swal from 'sweetalert2'
+import { useForm, useField } from 'vee-validate'
+import * as yup from 'yup'
 
-// core
+// Routing & Store
 const store = useStore()
-const router = useRouter()
 const route = useRoute()
-const formKey = ref(0)
-
-const isEdit = ref(false)
+const router = useRouter()
 const leadId = route.params.id
+const isEditMode = ref(!!leadId)
+const formReady = ref(false)
 
-const existingLead = ref(null)
-
-const formInitialValues = ref({
-  name: '',
-  company: '',
-  contact:'',
-  budget: '',
-  status: ''
-})
-
-const leadSchema = yup.object({
+// Schema
+const schema = yup.object({
   name: yup.string().required('Name is required'),
   company: yup.string().required('Company is required'),
-  contact: yup.number().required('Contact is required').positive('Must be positive').test('len', 'Contact must be 10 digits', val => val && val.toString().length === 10),
-  budget: yup.number().required('Budget is required').positive('Must be positive'),
-  status: yup.string().required('Status is required')
+  contact: yup
+    .string()
+    .required('Contact is required')
+    .matches(/^[0-9]{10}$/, 'Contact must be a 10-digit number'),
+  budget: yup
+    .string()
+    .required('Budget is required')
+    .matches(/^\d+$/, 'Budget must be digits only'),
+  status: yup.string().required('Status is required'),
 })
 
+// useForm with schema
+const { handleSubmit, setValues } = useForm({
+  validationSchema: schema,
+})
 
-onMounted(() => {
-  if (leadId) {
-    const leads = store.state.leads.leads
-    existingLead.value = leads.find(lead => lead.id === leadId)
-    if (existingLead.value) {
-      isEdit.value = true
-      formInitialValues.value = {
-        name: existingLead.value.name,
-        company: existingLead.value.company,
-        contact: existingLead.value.contact || '',
-        budget: existingLead.value.budget,
-        status: existingLead.value.status
+// useField bindings
+const { value: nameValue, errorMessage: nameError } = useField('name')
+const { value: companyValue, errorMessage: companyError } = useField('company')
+const { value: contactValue, errorMessage: contactError } = useField('contact')
+const { value: budgetValue, errorMessage: budgetError } = useField('budget')
+const { value: statusValue, errorMessage: statusError } = useField('status')
+
+// Submit handler
+const onSubmit = async (values) => {
+  console.log('🟢 Form Submitted:', values)
+  try {
+    if (isEditMode.value) {
+      await store.dispatch('leads/updateLead', { ...values, id: leadId })
+      await Swal.fire('Updated!', 'Lead updated successfully.', 'success')
+    } else {
+      await store.dispatch('leads/addLead', values)
+      await Swal.fire('Saved!', 'Lead added successfully.', 'success')
+    }
+    router.push('/leads')
+  } catch (err) {
+    console.error('Submission error:', err)
+    await Swal.fire('Error', 'Something went wrong. Try again.', 'error')
+  }
+}
+
+// Validation handler
+const onInvalid = () => {
+  Swal.fire({
+    icon: 'warning',
+    title: 'Validation Error',
+    text: 'Please fix the highlighted errors.',
+  })
+}
+
+// Submit wrapper (AFTER onSubmit is defined!)
+const submitForm = handleSubmit(onSubmit, onInvalid)
+
+// Load data if editing
+onMounted(async () => {
+  
+  if (isEditMode.value) {
+    try {
+      await store.dispatch('leads/fetchLeads')
+      const lead = store.state.leads.leads.find(l => l.id === leadId)
+      if (lead) {
+        setValues(lead)
+       
+      } else {
+        Swal.fire('Error', 'Lead not found', 'error')
       }
-      formKey.value++  
+    } catch (err) {
+      console.error(' Error loading leads:', err)
+      Swal.fire('Error', 'Failed to load lead data.', 'error')
     }
   }
+  formReady.value = true
 })
-
-// form submit
-function onSubmit(values) {
-  if (isEdit.value) {
-    const updated = { ...values, id: existingLead.value.id }
-    store.dispatch('leads/updateLead', { lead: updated })
-  } else {
-    const newLead = { ...values, id: Date.now() }
-
-    store.dispatch('leads/addLead', newLead)
-  }
-  router.push('/leads')
-}
 </script>
-
 <style scoped>
 .card-header {
   font-weight: bold;
 }
+.is-invalid {
+  border-color: #dc3545;
+}
 </style>
-
